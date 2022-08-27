@@ -7,6 +7,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { db } from "../firebase.config";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
@@ -136,7 +137,7 @@ function CreateListing() {
       });
     };
 
-    const imgUrls = await Promise.all(
+    const imageUrls = await Promise.all(
       [...images].map((image) => getUrl(image))
     ).catch(() => {
       setLoading(false);
@@ -144,7 +145,26 @@ function CreateListing() {
       return;
     });
 
+    const formDataCopy = {
+      ...formData,
+      imageUrls,
+      geolocation,
+      timestamp: serverTimestamp(),
+    };
+
+    delete formDataCopy.images;
+    delete formDataCopy.address;
+    delete formDataCopy.latitude;
+    delete formDataCopy.longitude;
+    location && (formDataCopy.location = location);
+    !formDataCopy.offer && delete formDataCopy.discountedPrice;
+
+    console.log(formDataCopy);
+
+    const docRef = await addDoc(collection(db, "listing"), formDataCopy);
     setLoading(false);
+    toast.success("Listing saved succesfully");
+    navigate(`category/${formDataCopy.type}/${docRef.id}`);
   };
 
   const onMutate = (e) => {

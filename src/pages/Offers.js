@@ -58,7 +58,7 @@ function Offers() {
       ) : listings && listings.length > 0 ? (
         <>
           <main>
-            <ul className="categoryListing">
+            <ul className="categoryListings">
               {listings.map((listing) => (
                 <ListingItem
                   key={listing.id}
