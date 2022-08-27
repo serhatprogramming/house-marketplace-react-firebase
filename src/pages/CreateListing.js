@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
-import { async } from "@firebase/util";
 
 function CreateListing() {
   // eslint-disable-next-line no-unused-vars
@@ -164,7 +163,7 @@ function CreateListing() {
     const docRef = await addDoc(collection(db, "listing"), formDataCopy);
     setLoading(false);
     toast.success("Listing saved succesfully");
-    navigate(`category/${formDataCopy.type}/${docRef.id}`);
+    navigate(`/category/${formDataCopy.type}/${docRef.id}`);
   };
 
   const onMutate = (e) => {
