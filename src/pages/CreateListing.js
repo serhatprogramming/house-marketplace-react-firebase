@@ -1,8 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+import { db } from "../firebase.config";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { toast } from "react-toastify";
+import { v4 as uuidv4 } from "uuid";
+import { async } from "@firebase/util";
 
 function CreateListing() {
   // eslint-disable-next-line no-unused-vars
@@ -102,6 +111,39 @@ function CreateListing() {
       location = address;
     }
 
+    // Store images in firebase
+    const getUrl = async (image) => {
+      return new Promise((resolve, reject) => {
+        const storage = getStorage();
+        const fileName =
+          "images/" + auth.currentUser.uid + "-" + image.name + "-" + uuidv4();
+        const storageRef = ref(storage, fileName);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            console.log("uploading");
+          },
+          (error) => {
+            reject("Error while uploading" + error);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL);
+            });
+          }
+        );
+      });
+    };
+
+    const imgUrls = await Promise.all(
+      [...images].map((image) => getUrl(image))
+    ).catch(() => {
+      setLoading(false);
+      toast.error("Image did not upload");
+      return;
+    });
+
     setLoading(false);
   };
 
@@ -133,7 +175,9 @@ function CreateListing() {
     }
   };
 
-  if (loading) return <Spinner />;
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="profile">
