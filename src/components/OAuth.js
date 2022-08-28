@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase.config";
@@ -40,6 +40,12 @@ function OAuth() {
       <button className="socialIconDiv" onClick={onGoogleClick}>
         <img className="socialIconImg" src={googleIcon} alt="google sign in" />
       </button>
+      <Link
+        to={location.pathname !== "/sign-up" ? "/sign-up" : "/sign-in"}
+        className="registerLink"
+      >
+        Sign {location.pathname !== "/sign-up" ? "Up" : "In"} Instead
+      </Link>
     </div>
   );
 }
