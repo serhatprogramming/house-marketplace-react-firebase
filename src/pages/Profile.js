@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import {
   updateDoc,
   doc,
-  getDoc,
   getDocs,
   collection,
   query,
@@ -102,6 +101,8 @@ function Profile() {
     }
   };
 
+  const onEdit = async (listingId) => navigate(`/edit-listing/${listingId}`);
+
   if (loading) {
     return <Spinner />;
   }
@@ -165,6 +166,7 @@ function Profile() {
                   listing={data}
                   id={id}
                   onDelete={() => onDelete(id)}
+                  onEdit={() => onEdit(id)}
                 />
               ))}
             </ul>
